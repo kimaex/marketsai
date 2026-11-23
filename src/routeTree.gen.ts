@@ -10,33 +10,44 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ApiPublicX402MarketReportRouteImport } from './routes/api/public/x402/market-report'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicX402MarketReportRoute =
+  ApiPublicX402MarketReportRouteImport.update({
+    id: '/api/public/x402/market-report',
+    path: '/api/public/x402/market-report',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/api/public/x402/market-report': typeof ApiPublicX402MarketReportRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/api/public/x402/market-report': typeof ApiPublicX402MarketReportRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/api/public/x402/market-report': typeof ApiPublicX402MarketReportRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/api/public/x402/market-report'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/api/public/x402/market-report'
+  id: '__root__' | '/' | '/api/public/x402/market-report'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ApiPublicX402MarketReportRoute: typeof ApiPublicX402MarketReportRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +59,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/x402/market-report': {
+      id: '/api/public/x402/market-report'
+      path: '/api/public/x402/market-report'
+      fullPath: '/api/public/x402/market-report'
+      preLoaderRoute: typeof ApiPublicX402MarketReportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ApiPublicX402MarketReportRoute: ApiPublicX402MarketReportRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
