@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ApiPublicAgentRegistrationRouteImport } from './routes/api/public/agent-registration'
 import { Route as ApiPublicX402MarketReportRouteImport } from './routes/api/public/x402/market-report'
 
 const IndexRoute = IndexRouteImport.update({
@@ -17,6 +18,12 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicAgentRegistrationRoute =
+  ApiPublicAgentRegistrationRouteImport.update({
+    id: '/api/public/agent-registration',
+    path: '/api/public/agent-registration',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicX402MarketReportRoute =
   ApiPublicX402MarketReportRouteImport.update({
     id: '/api/public/x402/market-report',
@@ -26,27 +33,36 @@ const ApiPublicX402MarketReportRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/api/public/agent-registration': typeof ApiPublicAgentRegistrationRoute
   '/api/public/x402/market-report': typeof ApiPublicX402MarketReportRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/api/public/agent-registration': typeof ApiPublicAgentRegistrationRoute
   '/api/public/x402/market-report': typeof ApiPublicX402MarketReportRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/api/public/agent-registration': typeof ApiPublicAgentRegistrationRoute
   '/api/public/x402/market-report': typeof ApiPublicX402MarketReportRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/api/public/x402/market-report'
+  fullPaths:
+    '/' | '/api/public/agent-registration' | '/api/public/x402/market-report'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/api/public/x402/market-report'
-  id: '__root__' | '/' | '/api/public/x402/market-report'
+  to: '/' | '/api/public/agent-registration' | '/api/public/x402/market-report'
+  id:
+    | '__root__'
+    | '/'
+    | '/api/public/agent-registration'
+    | '/api/public/x402/market-report'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ApiPublicAgentRegistrationRoute: typeof ApiPublicAgentRegistrationRoute
   ApiPublicX402MarketReportRoute: typeof ApiPublicX402MarketReportRoute
 }
 
@@ -57,6 +73,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/agent-registration': {
+      id: '/api/public/agent-registration'
+      path: '/api/public/agent-registration'
+      fullPath: '/api/public/agent-registration'
+      preLoaderRoute: typeof ApiPublicAgentRegistrationRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/x402/market-report': {
@@ -71,6 +94,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ApiPublicAgentRegistrationRoute: ApiPublicAgentRegistrationRoute,
   ApiPublicX402MarketReportRoute: ApiPublicX402MarketReportRoute,
 }
 export const routeTree = rootRouteImport

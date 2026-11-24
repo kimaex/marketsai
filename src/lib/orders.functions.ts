@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { canSupplierMove } from "./procurement";
+import type { Database } from "@/integrations/supabase/types";
 
 const idInput = z.object({ orderId: z.string().uuid() });
 
@@ -67,10 +68,10 @@ export const supplierUpdateOrder = createServerFn({ method: "POST" })
     if (!order || sup?.owner_id !== context.userId) return { ok: false as const, reason: "Order not found" };
     if (!canSupplierMove(order.status, data.to)) return { ok: false as const, reason: `Can't move from ${order.status} to ${data.to}` };
     const now = new Date().toISOString();
-    const stamp: Record<string, string> = { confirmed: "confirmed_at", shipped: "shipped_at", delivered: "delivered_at" };
-    const patch: Record<string, unknown> = { status: data.to, supplier_note: data.note ?? null };
-    const col = stamp[data.to];
-    if (col) patch[col] = now;
+    const patch: Database["public"]["Tables"]["orders"]["Update"] = { status: data.to, supplier_note: data.note ?? null };
+    if (data.to === "confirmed") patch.confirmed_at = now;
+    if (data.to === "shipped") patch.shipped_at = now;
+    if (data.to === "delivered") patch.delivered_at = now;
     const { data: updated } = await supabaseAdmin.from("orders").update(patch).eq("id", order.id).eq("status", order.status).select("id").maybeSingle();
     if (!updated) return { ok: false as const, reason: "Order changed, refresh and try again" };
     const labels: Record<string, string> = {

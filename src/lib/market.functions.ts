@@ -47,7 +47,7 @@ export const buyMarketReport = createServerFn({ method: "POST" })
     const origin = new URL(getRequest().url).origin;
     try {
       const r = await buyReport(context.userId, origin, data.product);
-      return { ok: true as const, report: r.data as Record<string, unknown>, txHash: r.txHash, amountUsd: r.amountUsd };
+      return { ok: true as const, reportJson: JSON.stringify(r.data), txHash: r.txHash, amountUsd: r.amountUsd };
     } catch (e) {
       console.error("x402 buy failed", e);
       return { ok: false as const, reason: e instanceof Error ? e.message.slice(0, 240) : "Payment failed" };
