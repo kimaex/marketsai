@@ -10,6 +10,15 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedAgentRouteImport } from './routes/_authenticated/agent'
+import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedMarketRouteImport } from './routes/_authenticated/market'
+import { Route as AuthenticatedMarketplaceRouteImport } from './routes/_authenticated/marketplace'
+import { Route as AuthenticatedOrdersRouteImport } from './routes/_authenticated/orders'
+import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
+import { Route as AuthenticatedSupplierRouteImport } from './routes/_authenticated/supplier'
 import { Route as ApiPublicAgentRegistrationRouteImport } from './routes/api/public/agent-registration'
 import { Route as ApiPublicX402MarketReportRouteImport } from './routes/api/public/x402/market-report'
 
@@ -17,6 +26,51 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedAgentRoute = AuthenticatedAgentRouteImport.update({
+  id: '/agent',
+  path: '/agent',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedMarketRoute = AuthenticatedMarketRouteImport.update({
+  id: '/market',
+  path: '/market',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedMarketplaceRoute =
+  AuthenticatedMarketplaceRouteImport.update({
+    id: '/marketplace',
+    path: '/marketplace',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedOrdersRoute = AuthenticatedOrdersRouteImport.update({
+  id: '/orders',
+  path: '/orders',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedSupplierRoute = AuthenticatedSupplierRouteImport.update({
+  id: '/supplier',
+  path: '/supplier',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const ApiPublicAgentRegistrationRoute =
   ApiPublicAgentRegistrationRouteImport.update({
@@ -33,35 +87,92 @@ const ApiPublicX402MarketReportRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/agent': typeof AuthenticatedAgentRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/market': typeof AuthenticatedMarketRoute
+  '/marketplace': typeof AuthenticatedMarketplaceRoute
+  '/orders': typeof AuthenticatedOrdersRoute
+  '/settings': typeof AuthenticatedSettingsRoute
+  '/supplier': typeof AuthenticatedSupplierRoute
   '/api/public/agent-registration': typeof ApiPublicAgentRegistrationRoute
   '/api/public/x402/market-report': typeof ApiPublicX402MarketReportRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/agent': typeof AuthenticatedAgentRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/market': typeof AuthenticatedMarketRoute
+  '/marketplace': typeof AuthenticatedMarketplaceRoute
+  '/orders': typeof AuthenticatedOrdersRoute
+  '/settings': typeof AuthenticatedSettingsRoute
+  '/supplier': typeof AuthenticatedSupplierRoute
   '/api/public/agent-registration': typeof ApiPublicAgentRegistrationRoute
   '/api/public/x402/market-report': typeof ApiPublicX402MarketReportRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/_authenticated/agent': typeof AuthenticatedAgentRoute
+  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/market': typeof AuthenticatedMarketRoute
+  '/_authenticated/marketplace': typeof AuthenticatedMarketplaceRoute
+  '/_authenticated/orders': typeof AuthenticatedOrdersRoute
+  '/_authenticated/settings': typeof AuthenticatedSettingsRoute
+  '/_authenticated/supplier': typeof AuthenticatedSupplierRoute
   '/api/public/agent-registration': typeof ApiPublicAgentRegistrationRoute
   '/api/public/x402/market-report': typeof ApiPublicX402MarketReportRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/api/public/agent-registration' | '/api/public/x402/market-report'
+    | '/'
+    | '/auth'
+    | '/agent'
+    | '/dashboard'
+    | '/market'
+    | '/marketplace'
+    | '/orders'
+    | '/settings'
+    | '/supplier'
+    | '/api/public/agent-registration'
+    | '/api/public/x402/market-report'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/api/public/agent-registration' | '/api/public/x402/market-report'
+  to:
+    | '/'
+    | '/auth'
+    | '/agent'
+    | '/dashboard'
+    | '/market'
+    | '/marketplace'
+    | '/orders'
+    | '/settings'
+    | '/supplier'
+    | '/api/public/agent-registration'
+    | '/api/public/x402/market-report'
   id:
     | '__root__'
     | '/'
+    | '/_authenticated'
+    | '/auth'
+    | '/_authenticated/agent'
+    | '/_authenticated/dashboard'
+    | '/_authenticated/market'
+    | '/_authenticated/marketplace'
+    | '/_authenticated/orders'
+    | '/_authenticated/settings'
+    | '/_authenticated/supplier'
     | '/api/public/agent-registration'
     | '/api/public/x402/market-report'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AuthRoute: typeof AuthRoute
   ApiPublicAgentRegistrationRoute: typeof ApiPublicAgentRegistrationRoute
   ApiPublicX402MarketReportRoute: typeof ApiPublicX402MarketReportRoute
 }
@@ -74,6 +185,69 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/agent': {
+      id: '/_authenticated/agent'
+      path: '/agent'
+      fullPath: '/agent'
+      preLoaderRoute: typeof AuthenticatedAgentRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/market': {
+      id: '/_authenticated/market'
+      path: '/market'
+      fullPath: '/market'
+      preLoaderRoute: typeof AuthenticatedMarketRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/marketplace': {
+      id: '/_authenticated/marketplace'
+      path: '/marketplace'
+      fullPath: '/marketplace'
+      preLoaderRoute: typeof AuthenticatedMarketplaceRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/orders': {
+      id: '/_authenticated/orders'
+      path: '/orders'
+      fullPath: '/orders'
+      preLoaderRoute: typeof AuthenticatedOrdersRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/settings': {
+      id: '/_authenticated/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AuthenticatedSettingsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/supplier': {
+      id: '/_authenticated/supplier'
+      path: '/supplier'
+      fullPath: '/supplier'
+      preLoaderRoute: typeof AuthenticatedSupplierRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/api/public/agent-registration': {
       id: '/api/public/agent-registration'
@@ -92,8 +266,33 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAgentRoute: typeof AuthenticatedAgentRoute
+  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedMarketRoute: typeof AuthenticatedMarketRoute
+  AuthenticatedMarketplaceRoute: typeof AuthenticatedMarketplaceRoute
+  AuthenticatedOrdersRoute: typeof AuthenticatedOrdersRoute
+  AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
+  AuthenticatedSupplierRoute: typeof AuthenticatedSupplierRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAgentRoute: AuthenticatedAgentRoute,
+  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedMarketRoute: AuthenticatedMarketRoute,
+  AuthenticatedMarketplaceRoute: AuthenticatedMarketplaceRoute,
+  AuthenticatedOrdersRoute: AuthenticatedOrdersRoute,
+  AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
+  AuthenticatedSupplierRoute: AuthenticatedSupplierRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AuthRoute: AuthRoute,
   ApiPublicAgentRegistrationRoute: ApiPublicAgentRegistrationRoute,
   ApiPublicX402MarketReportRoute: ApiPublicX402MarketReportRoute,
 }

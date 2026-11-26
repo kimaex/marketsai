@@ -1,0 +1,25 @@
+import { useState } from 'react';
+import { useSuspenseQuery,useQueryClient } from '@tanstack/react-query';
+import { useServerFn } from '@tanstack/react-start';
+import { Package, ExternalLink, Check, RefreshCw } from 'lucide-react';
+import { toast } from 'sonner';
+import { accountData } from '@/lib/app-data';
+import { approveAndPay,cancelOrder,buyerConfirmDelivery,refreshPayment,supplierUpdateOrder } from '@/lib/orders.functions';
+import { ngn,usd,dateTime,ORDER_STATUS_LABEL } from '@/lib/format';
+import { txUrl,shortHash } from '@/lib/celo';
+import { PageHeader } from './AppShell';
+import { Empty } from './Dashboard';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+
+export function Orders({supplier=false}:{supplier?:boolean}) {
+ const {data:a}=useSuspenseQuery(accountData);const qc=useQueryClient();const [busy,setBusy]=useState<string|null>(null);
+ const pay=useServerFn(approveAndPay),cancel=useServerFn(cancelOrder),received=useServerFn(buyerConfirmDelivery),refresh=useServerFn(refreshPayment),update=useServerFn(supplierUpdateOrder);
+ const own=a.suppliers.find(s=>s.owner_id===a.user.id);
+ const orders=a.orders.filter(o=>supplier?o.supplier_id===own?.id:o.buyer_id===a.user.id);
+ async function action(id:string,fn:()=>Promise<unknown>) {setBusy(id);try{const r=await fn() as {ok?:boolean;reason?:string};if(r.ok===false)toast.error(r.reason??'Action failed');else{toast.success('Order updated');await qc.invalidateQueries({queryKey:['account']});await qc.invalidateQueries({queryKey:['wallet']});}}catch{toast.error('Could not update this order');}finally{setBusy(null);}}
+ return <>{!supplier&&<PageHeader title="Purchase orders" subtitle="From owner approval to supplier delivery."/>}<div className={supplier?'space-y-4':'space-y-4 px-4 lg:px-8'}>
+ {!orders.length?<Empty icon={Package} title={supplier?'No purchase orders yet':'No orders yet'} text={supplier?'Orders for your products will appear here.':'Ask your agent to source a product, or request a purchase in the marketplace.'}/>:orders.map(o=><article key={o.id} className="rounded-lg border bg-card p-5"><div className="flex flex-wrap items-center justify-between gap-3"><div><p className="font-mono text-xs text-muted-foreground">{o.order_number} · {dateTime(o.created_at)}</p><h2 className="mt-1 text-xl font-bold">{o.quantity} × {o.product_name}</h2><p className="mt-1 text-sm text-muted-foreground">{o.unit} · {a.suppliers.find(s=>s.id===o.supplier_id)?.business_name}</p></div><Badge variant={o.payment_status==='paid'?'success':o.status==='failed'?'danger':'warning'}>{ORDER_STATUS_LABEL[o.status]??o.status}</Badge></div><div className="mt-5 grid gap-4 border-y py-4 sm:grid-cols-3"><div className="text-xs text-muted-foreground">Landed cost<div className="mt-1 text-xl font-semibold text-foreground">{ngn(o.total_ngn)}</div><p>Includes {ngn(o.delivery_fee_ngn)} delivery</p></div><div className="text-xs text-muted-foreground">Payment<div className="mt-1 text-xl font-semibold text-foreground">{usd(o.total_usd)} {o.pay_token}</div><p>{o.fx_source}</p></div><div className="text-xs text-muted-foreground">Potential savings<div className="mt-1 text-xl font-semibold text-primary">{ngn(o.savings_ngn)}</div><p>Versus alternative quotes</p></div></div>{o.delivery_address&&<p className="mt-3 text-sm text-muted-foreground">Delivery: {o.delivery_address}</p>}{o.payment_error&&<p role="alert" className="mt-3 text-sm text-destructive">{o.payment_error}</p>}{o.tx_hash&&<a className="mt-4 inline-flex items-center gap-2 text-sm text-onchain" href={txUrl(o.tx_hash)} target="_blank" rel="noreferrer"><ExternalLink className="size-4"/> Celo transaction {shortHash(o.tx_hash)}</a>}
+ <div className="mt-4 flex flex-wrap gap-2">{!supplier&&['proposed','failed'].includes(o.status)&&<><Button disabled={busy===o.id} onClick={()=>{if(window.confirm(`Authorize a real Celo mainnet payment of ${usd(o.total_usd)} ${o.pay_token} for ${o.order_number}?`))action(o.id,()=>pay({data:{orderId:o.id}}));}}>Approve & pay {usd(o.total_usd)}</Button><Button variant="outline" disabled={busy===o.id} onClick={()=>action(o.id,()=>cancel({data:{orderId:o.id}}))}>Cancel</Button></>}{o.status==='paying'&&<Button variant="outline" onClick={()=>action(o.id,()=>refresh({data:{orderId:o.id}}))}><RefreshCw/> Check payment</Button>}{!supplier&&['confirmed','shipped'].includes(o.status)&&<Button onClick={()=>action(o.id,()=>received({data:{orderId:o.id}}))}><Check/> Goods received</Button>}{supplier&&o.status==='paid'&&<><Button onClick={()=>action(o.id,()=>update({data:{orderId:o.id,to:'confirmed'}}))}>Confirm order</Button><Button variant="outline" onClick={()=>action(o.id,()=>update({data:{orderId:o.id,to:'declined'}}))}>Decline</Button></>}{supplier&&o.status==='confirmed'&&<Button onClick={()=>action(o.id,()=>update({data:{orderId:o.id,to:'shipped'}}))}>Mark dispatched</Button>}{supplier&&o.status==='shipped'&&<Button onClick={()=>action(o.id,()=>update({data:{orderId:o.id,to:'delivered'}}))}>Mark delivered</Button>}</div></article>)}
+ </div></>;
+}
