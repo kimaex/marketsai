@@ -1,10 +1,125 @@
-import { useQuery } from '@tanstack/react-query';
-import { useServerFn } from '@tanstack/react-start';
-import { LineChart,RefreshCw } from 'lucide-react';
-import { getMarketIntel } from '@/lib/market.functions';
-import { ngn,num } from '@/lib/format';
-import { PageHeader } from './AppShell';
-import { Empty } from './Dashboard';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-export function MarketIntel(){const call=useServerFn(getMarketIntel);const {data,isPending,error,refetch}=useQuery({queryKey:['intel'],queryFn:()=>call({data:{}})});return <><PageHeader title="Market intelligence" subtitle="Real listing prices. Live onchain currency quotes." actions={<Button variant="outline" onClick={()=>refetch()}><RefreshCw/>Refresh</Button>}/><div className="space-y-7 px-4 lg:px-8">{isPending?<p className="text-muted-foreground">Fetching live market data…</p>:error?<p role="alert">Market data is temporarily unavailable.</p>:<><section><h2 className="mb-4 text-xl font-bold">African currency quotes</h2><div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">{['NGN','GHS','KES','ZAR'].map(c=>{const quote=data?.fx.mento?.[c];return <div key={c} className="rounded-lg border bg-card p-5"><div className="flex justify-between"><h3>{c}</h3><Badge variant={quote?'onchain':'muted'}>{quote?'Mento onchain':'Unavailable'}</Badge></div><div className="mt-4 text-2xl font-bold">{quote?num(quote.rate):'—'}</div><p className="mt-1 text-xs text-muted-foreground">{quote?`${quote.token} per 1 USDm`:'No onchain quote available'}</p></div>;})}</div></section><section><h2 className="mb-4 text-xl font-bold">Supplier price ranges</h2>{!data?.stats.current.length?<Empty icon={LineChart} title="No market prices yet" text="Comparisons and trends come from real supplier listings, not estimated or invented prices."/>:<div className="overflow-x-auto"><table className="w-full text-left text-sm"><thead className="text-xs text-muted-foreground"><tr>{['Category / unit','Listings','Lowest','Average','Highest','Spread'].map(h=><th className="py-3 pr-4" key={h}>{h}</th>)}</tr></thead><tbody className="divide-y">{data.stats.current.map(g=><tr key={`${g.category}-${g.unit}`}><td className="py-4">{g.category}<div className="text-xs text-muted-foreground">{g.unit}</div></td><td>{g.listings}</td><td className="text-primary">{ngn(g.min)}</td><td>{ngn(g.avg)}</td><td>{ngn(g.max)}</td><td>{g.spreadPct}%</td></tr>)}</tbody></table></div>}</section><section><h2 className="mb-4 text-xl font-bold">Recorded price changes</h2>{(data?.stats.trend.length??0)<2?<p className="text-sm text-muted-foreground">Not enough historical observations to establish a trend.</p>:data?.stats.trend.map(t=><div className="flex justify-between border-b py-3 text-sm" key={t.day}><span>{t.day}</span><span>{ngn(t.avg)} average · {t.points} observations</span></div>)}</section></>}</div></>;}
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { LineChart, RefreshCw } from "lucide-react";
+import { getMarketIntel } from "@/lib/market.functions";
+import { ngn, num } from "@/lib/format";
+import { PageHeader } from "./AppShell";
+import { Empty } from "./Dashboard";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+export function MarketIntel() {
+  const call = useServerFn(getMarketIntel);
+  const { data, isPending, error, refetch } = useQuery({
+    queryKey: ["intel"],
+    queryFn: () => call({ data: {} }),
+  });
+  return (
+    <>
+      <PageHeader
+        title="Market intelligence"
+        subtitle="Real listing prices. Live onchain currency quotes."
+        actions={
+          <Button variant="outline" onClick={() => refetch()}>
+            <RefreshCw />
+            Refresh
+          </Button>
+        }
+      />
+      <div className="space-y-7 px-4 lg:px-8">
+        {isPending ? (
+          <p className="text-muted-foreground">Fetching live market data…</p>
+        ) : error ? (
+          <p role="alert">Market data is temporarily unavailable.</p>
+        ) : (
+          <>
+            <section>
+              <h2 className="mb-4 text-xl font-bold">African currency quotes</h2>
+              <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                {["NGN", "GHS", "KES", "ZAR"].map((c) => {
+                  const quote = data?.fx.mento?.[c];
+                  return (
+                    <div key={c} className="rounded-lg border bg-card p-5">
+                      <div className="flex justify-between">
+                        <h3>{c}</h3>
+                        <Badge variant={quote ? "onchain" : "muted"}>
+                          {quote ? "Mento onchain" : "Unavailable"}
+                        </Badge>
+                      </div>
+                      <div className="mt-4 text-2xl font-bold">{quote ? num(quote.rate) : "—"}</div>
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        {quote ? `${quote.token} per 1 USDm` : "No onchain quote available"}
+                      </p>
+                    </div>
+                  );
+                })}
+              </div>
+            </section>
+            <section>
+              <h2 className="mb-4 text-xl font-bold">Supplier price ranges</h2>
+              {!data?.stats.current.length ? (
+                <Empty
+                  icon={LineChart}
+                  title="No market prices yet"
+                  text="Comparisons and trends come from real supplier listings, not estimated or invented prices."
+                />
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-sm">
+                    <thead className="text-xs text-muted-foreground">
+                      <tr>
+                        {[
+                          "Category / unit",
+                          "Listings",
+                          "Lowest",
+                          "Average",
+                          "Highest",
+                          "Spread",
+                        ].map((h) => (
+                          <th className="py-3 pr-4" key={h}>
+                            {h}
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y">
+                      {data.stats.current.map((g) => (
+                        <tr key={`${g.category}-${g.unit}`}>
+                          <td className="py-4">
+                            {g.category}
+                            <div className="text-xs text-muted-foreground">{g.unit}</div>
+                          </td>
+                          <td>{g.listings}</td>
+                          <td className="text-primary">{ngn(g.min)}</td>
+                          <td>{ngn(g.avg)}</td>
+                          <td>{ngn(g.max)}</td>
+                          <td>{g.spreadPct}%</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </section>
+            <section>
+              <h2 className="mb-4 text-xl font-bold">Recorded price changes</h2>
+              {(data?.stats.trend.length ?? 0) < 2 ? (
+                <p className="text-sm text-muted-foreground">
+                  Not enough historical observations to establish a trend.
+                </p>
+              ) : (
+                data?.stats.trend.map((t) => (
+                  <div className="flex justify-between border-b py-3 text-sm" key={t.day}>
+                    <span>{t.day}</span>
+                    <span>
+                      {ngn(t.avg)} average · {t.points} observations
+                    </span>
+                  </div>
+                ))
+              )}
+            </section>
+          </>
+        )}
+      </div>
+    </>
+  );
+}

@@ -1,6 +1,15 @@
 import { Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
-import { Bot, LayoutDashboard, LineChart, LogOut, Package, Settings2, Store, Truck } from "lucide-react";
+import {
+  Bot,
+  LayoutDashboard,
+  LineChart,
+  LogOut,
+  Package,
+  Settings2,
+  Store,
+  Truck,
+} from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Logo, LogoMark } from "./Logo";
 import { Button } from "@/components/ui/button";
@@ -47,7 +56,9 @@ export function AppShell() {
                 to={n.to}
                 className={cn(
                   "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors",
-                  active ? "bg-sidebar-accent text-sidebar-accent-foreground" : "text-sidebar-foreground/70 hover:bg-sidebar-accent/60 hover:text-sidebar-foreground",
+                  active
+                    ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                    : "text-sidebar-foreground/70 hover:bg-sidebar-accent/60 hover:text-sidebar-foreground",
                 )}
               >
                 <n.icon className={cn("size-4", active && "text-primary")} />
@@ -58,7 +69,12 @@ export function AppShell() {
         </nav>
         <div className="m-3 rounded-xl border border-sidebar-border bg-sidebar-accent/40 p-3">
           <div className="truncate text-xs text-muted-foreground">{user?.email}</div>
-          <Button variant="ghost" size="sm" className="mt-2 w-full justify-start px-2" onClick={signOut}>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="mt-2 w-full justify-start px-2"
+            onClick={signOut}
+          >
             <LogOut /> Sign out
           </Button>
         </div>
@@ -67,14 +83,20 @@ export function AppShell() {
       <header className="sticky top-0 z-20 flex items-center justify-between border-b border-border bg-background/85 px-4 py-3 backdrop-blur lg:hidden">
         <Link to="/dashboard" className="flex items-center gap-2">
           <LogoMark className="size-8" />
-          <span className="font-display text-base font-bold">MarketMate <span className="text-gradient-primary">AI</span></span>
+          <span className="font-display text-base font-bold">
+            MarketMate <span className="text-gradient-primary">AI</span>
+          </span>
         </Link>
         <div className="flex items-center gap-1">
           <Button asChild variant="ghost" size="icon" aria-label="Market intelligence">
-            <Link to="/market"><LineChart /></Link>
+            <Link to="/market">
+              <LineChart />
+            </Link>
           </Button>
           <Button asChild variant="ghost" size="icon" aria-label="Supplier portal">
-            <Link to="/supplier"><Truck /></Link>
+            <Link to="/supplier">
+              <Truck />
+            </Link>
           </Button>
           <Button variant="ghost" size="icon" aria-label="Sign out" onClick={signOut}>
             <LogOut />
@@ -90,7 +112,14 @@ export function AppShell() {
         {NAV.filter((n) => MOBILE.includes(n.to)).map((n) => {
           const active = pathname.startsWith(n.to);
           return (
-            <Link key={n.to} to={n.to} className={cn("flex flex-col items-center gap-1 py-2.5 text-[11px] font-medium", active ? "text-primary" : "text-muted-foreground")}>
+            <Link
+              key={n.to}
+              to={n.to}
+              className={cn(
+                "flex flex-col items-center gap-1 py-2.5 text-[11px] font-medium",
+                active ? "text-primary" : "text-muted-foreground",
+              )}
+            >
               <n.icon className="size-5" />
               {n.short}
             </Link>
@@ -101,7 +130,15 @@ export function AppShell() {
   );
 }
 
-export function PageHeader({ title, subtitle, actions }: { title: string; subtitle?: string; actions?: React.ReactNode }) {
+export function PageHeader({
+  title,
+  subtitle,
+  actions,
+}: {
+  title: string;
+  subtitle?: string;
+  actions?: React.ReactNode;
+}) {
   return (
     <div className="flex flex-col gap-3 px-4 pt-6 pb-4 sm:flex-row sm:items-end sm:justify-between lg:px-8 lg:pt-8">
       <div>
