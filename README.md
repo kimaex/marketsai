@@ -1,190 +1,289 @@
-# Marketsai
+MarketMate AI
 
-BUILD MARKETMATE AI — AUTONOMOUS AFRICAN BUSINESS PROCUREMENT AGENT
+Your Business. Your Agent. Your Market.
 
-Build a production-quality AI agent called MarketMate AI, designed for African small businesses, wholesalers, retailers and entrepreneurs.
+MarketMate AI is an AI-powered autonomous procurement agent designed to transform how African businesses discover suppliers, compare prices, purchase products and manage business procurement using AI and blockchain technology.
 
-Mission
+Built by Kimaex, MarketMate AI aims to make business procurement smarter, faster, more transparent and accessible to small businesses across Africa.
 
-MarketMate AI is an autonomous procurement agent that helps African businesses find suppliers, compare prices, purchase products, make payments and track deliveries.
+---
 
-The objective is to demonstrate an AI agent performing a real economic task using Celo blockchain infrastructure.
+🌍 The Problem
 
-Target markets
+Millions of African businesses face procurement challenges every day:
 
-- Nigeria
-- Ghana
-- Kenya
-- South Africa
-- Other African markets
+- Difficulty finding reliable suppliers.
+- Time-consuming supplier negotiations.
+- Limited price transparency.
+- Inefficient purchasing processes.
+- Complicated payment and order management.
+- Limited access to intelligent procurement tools.
 
-Start with Nigeria as the primary market.
+Traditional procurement requires business owners to manually search, compare, negotiate and coordinate purchases.
 
-Core features
+MarketMate AI aims to simplify this entire process through autonomous AI agents.
 
-1. AI Procurement Assistant
+💡 Our Solution
 
-Allow users to communicate with the agent naturally.
+MarketMate AI introduces an intelligent procurement agent that helps businesses automate purchasing workflows.
+
+Instead of manually contacting multiple suppliers, business owners can simply tell their AI agent what they need.
 
 Example:
-"I need 50 bags of rice for my supermarket. Find reliable suppliers offering the best prices."
 
-The AI should:
+"I need 50 bags of rice for my supermarket. Find reliable suppliers, compare prices and recommend the best deal."
 
-- Understand the shopping request.
-- Search supplier listings and available APIs.
-- Compare product prices.
-- Calculate delivery costs.
-- Rank suppliers by price, reliability and delivery time.
-- Recommend the best purchase.
+MarketMate AI is designed to:
+
+1. Understand the purchasing request.
+2. Discover available suppliers.
+3. Compare product prices.
+4. Evaluate supplier offers.
+5. Calculate delivery costs.
+6. Recommend the best purchasing option.
+7. Request approval from the business owner.
+8. Execute authorized payments.
+9. Track orders and delivery.
+
+Our vision is to make procurement as simple as having a conversation.
+
+🤖 Core Features
+
+1. AI Procurement Agent
+
+An intelligent assistant that understands natural-language purchasing requests and helps businesses make purchasing decisions.
 
 2. Supplier Marketplace
 
-Build a supplier dashboard where verified suppliers can:
+A marketplace where suppliers can:
 
 - Register their businesses.
 - List products.
-- Set prices.
+- Set product prices.
 - Update inventory.
 - Receive purchase orders.
 - Confirm orders.
-- Update delivery status.
+- Manage deliveries.
 
-3. Autonomous Payments on Celo
+3. Autonomous Onchain Payments
 
-Integrate Celo mainnet.
+MarketMate AI is designed to leverage Celo blockchain infrastructure for transparent and verifiable payments.
 
-Use:
+Planned capabilities include:
 
-- x402 for paying APIs and services per request.
-- Supported dollar stablecoins for payments.
-- Onchain currency conversion where supported.
-- ERC-8004 for agent identity and reputation.
-- Agent-controlled wallet with owner-defined spending permissions.
+- Celo wallet integration.
+- Stablecoin payments.
+- Onchain transaction verification.
+- Automated payment workflows.
+- Payment records linked to purchase orders.
 
-All payments must be real, verifiable on Celo mainnet.
+4. x402 Integration
 
-4. Spending Controls
+MarketMate AI incorporates x402 payment protocol tooling to support machine-to-machine payments and pay-per-request access to compatible APIs and services.
 
-Allow business owners to configure:
+5. AI Spending Controls
 
-- Maximum payment per transaction.
-- Daily spending limit.
+Business owners remain in control of their funds through configurable permissions:
+
+- Maximum transaction limits.
+- Daily spending limits.
 - Approved suppliers.
-- Approved payment tokens.
-- Transactions requiring human approval.
+- Approved payment assets.
+- Human approval requirements.
+- Authorized autonomous purchasing rules.
 
-Never allow the agent to exceed its spending permissions.
+6. Procurement Intelligence
 
-Require explicit approval before purchasing goods or sending funds unless the owner has enabled a specific autonomous purchasing rule.
+The platform aims to provide:
 
-5. Order Management
+- Supplier comparisons.
+- Product price analysis.
+- Market intelligence.
+- Purchase recommendations.
+- Cost and savings calculations.
 
-Create an order management dashboard showing:
+7. Order Management
+
+Businesses can manage:
 
 - Pending orders.
 - Approved purchases.
 - Completed purchases.
-- Payment status.
-- Supplier details.
-- Delivery status.
-- Transaction hashes.
+- Supplier information.
+- Payment records.
+- Delivery updates.
+- Onchain transaction references.
 
-6. African Market Intelligence
+⛓️ Blockchain Infrastructure
 
-Build an AI feature that provides:
+MarketMate AI is being developed with Celo as its blockchain payment infrastructure.
 
-- Product price comparisons.
-- Supplier recommendations.
-- Market price trends.
-- Currency conversion.
-- Purchase recommendations.
-- Potential cost savings.
+Celo provides an EVM-compatible environment designed for accessible financial applications and payments.
 
-Never invent supplier prices or claim a supplier is verified without evidence.
+Our blockchain roadmap includes:
 
-7. User Dashboard
+- Celo mainnet integration.
+- Stablecoin payment support.
+- Viem for EVM blockchain interactions.
+- x402 for compatible machine-to-machine payments.
+- ERC-8004 agent identity and reputation exploration.
 
-Create a modern dashboard with:
+The objective is to enable AI agents to participate in real economic activities while keeping business owners in control.
 
-- Business wallet balance.
-- Total purchases.
-- Money saved.
-- Active orders.
-- Supplier performance.
-- Recent blockchain transactions.
-- AI procurement chat.
+🏗️ Technology Stack
 
-Technology requirements
+Component| Technology
+Frontend| React
+Language| TypeScript
+Framework| TanStack Start
+Styling| Tailwind CSS
+UI Components| Radix UI
+Database| Supabase
+ORM| Drizzle ORM
+AI Integration| AI SDK
+Blockchain| Celo
+Blockchain Library| Viem
+Payment Protocol| x402
+Build Tool| Vite
+Testing| Vitest
 
-- Frontend: React and responsive web design.
-- Backend: Node.js.
-- Database: PostgreSQL or Supabase.
-- AI: LLM-powered procurement assistant.
-- Blockchain: Celo mainnet.
-- Payments: x402.
-- Agent identity: ERC-8004.
-- Wallet: Owner-custodied or delegated agent wallet with strict permissions.
+🔄 How MarketMate AI Works
 
-Use official Celo-compatible integrations and verify supported tokens, payment endpoints and contract addresses before implementation.
+The intended procurement workflow:
 
-Hackathon demonstration
+1. Business owner submits a purchasing request.
+2. AI agent interprets the request.
+3. Agent searches available supplier listings.
+4. Agent compares prices and delivery costs.
+5. Agent recommends the best offer.
+6. Business owner approves the purchase.
+7. Spending permissions are validated.
+8. Authorized payment is executed through the configured Celo integration.
+9. Transaction is recorded.
+10. Supplier confirms and fulfils the order.
 
-Demonstrate the following complete workflow:
+🎯 Target Market
 
-1. A Nigerian supermarket owner logs in.
-2. The owner requests 20 bags of rice.
-3. MarketMate searches real supplier listings.
-4. The agent compares supplier prices.
-5. The agent recommends the best supplier.
-6. The owner approves the purchase.
-7. The agent executes a real Celo mainnet payment.
-8. The blockchain transaction is displayed.
-9. The supplier confirms the order.
-10. The agent tracks and updates the order.
+Our initial focus is Nigeria, with plans to expand across emerging African markets.
 
-Include transaction explorer links and verifiable onchain activity.
+Target customers include:
 
-Design
+- Supermarkets.
+- Retail businesses.
+- Wholesalers.
+- Distributors.
+- Restaurants.
+- Small and medium-sized enterprises.
+- Entrepreneurs.
 
-Create a premium fintech-style interface.
+🚀 Our Vision
 
-Brand: MarketMate AI.
+We believe the future of business procurement will be powered by intelligent autonomous agents.
 
-Tagline: "Your Business. Your Agent. Your Market."
+MarketMate AI aims to become a procurement infrastructure layer connecting African businesses, suppliers, AI agents and blockchain-based payments.
 
-Use a clean, modern African fintech design with:
+Our long-term vision is to build an ecosystem where businesses can delegate repetitive procurement activities to trusted AI agents while maintaining control over their decisions and finances.
 
-- Dark navy and green accents.
-- Professional dashboard.
-- Mobile-first responsive interface.
-- AI chat interface.
-- Supplier marketplace.
-- Transaction history.
+🧪 Hackathon Demonstration
 
-Final objective
+Our target demonstration is a complete procurement workflow:
 
-Do not build just a chatbot or a static dashboard.
+- A Nigerian business requests products.
+- MarketMate AI discovers suppliers.
+- AI compares available offers.
+- The business owner approves a purchase.
+- The authorized payment is processed through Celo.
+- The transaction is verifiable onchain.
+- The supplier confirms the order.
+- The business tracks delivery.
 
-Build a functioning autonomous business procurement agent that completes a real job, makes an authorized payment on Celo mainnet, and demonstrates measurable value to African businesses.
+Only confirmed live integrations and transactions will be represented as operational in the demonstration.
 
-This project was built with [Lovable](https://lovable.dev).
+🔐 Security
 
-## Build with Lovable
+Security and financial control are central to our architecture.
 
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/66b6e78a-11f4-47cf-a98c-86362cb08465).
+Our development priorities include:
 
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
+- Secure wallet management.
+- Server-side secret management.
+- Spending-limit enforcement.
+- Transaction authorization.
+- Supplier validation.
+- Payment verification.
+- Audit trails.
 
-## Development
+Private keys and API credentials must never be exposed in frontend code or committed to the repository.
 
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
+🛠️ Getting Started
 
-```sh
-git clone <this-repository-url>
-cd <repository-name>
-npm i
-npm run dev
+Prerequisites
+
+- Node.js
+- Bun or npm
+- Git
+
+Installation
+
+Clone the repository:
+
+```bash
+git clone https://github.com/kimaex/marketsai.git
 ```
+
+Navigate into the project:
+
+```bash
+cd marketsai
+```
+
+Install dependencies:
+
+```bash
+bun install
+```
+
+Start the development server:
+
+```bash
+bun run dev
+```
+
+Build the application:
+
+```bash
+bun run build
+```
+
+🗺️ Roadmap
+
+- [ ] Complete AI procurement assistant.
+- [ ] Supplier marketplace.
+- [ ] Real-time supplier discovery.
+- [ ] AI-powered price comparison.
+- [ ] Business authentication.
+- [ ] Spending permissions and controls.
+- [ ] Celo wallet integration.
+- [ ] Celo mainnet payment execution.
+- [ ] x402 payment integration.
+- [ ] ERC-8004 agent identity integration.
+- [ ] Purchase order management.
+- [ ] Supplier delivery tracking.
+- [ ] Pilot deployment with African businesses.
+
+🤝 Built by Kimaex
+
+MarketMate AI is a project developed by Kimaex, focused on building innovative AI and blockchain-powered financial and business infrastructure for Africa.
+
+We are building a future where every African business can have its own intelligent procurement agent.
+
+---
+
+Links
+
+- GitHub: https://github.com/kimaex/marketsai
+- Celo: https://celo.org/
+- x402: https://www.x402.org/
+- ERC-8004: https://eips.ethereum.org/EIPS/eip-8004
+
+MarketMate AI — Your Business. Your Agent. Your Market.
