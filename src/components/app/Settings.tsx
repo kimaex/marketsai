@@ -111,7 +111,7 @@ export function Settings() {
                 } else toast.error(r.reason);
               }}
             >
-              Claim agent wallet ownership
+              Request wallet ownership
             </Button>
           )}
           {w?.ownerExists && (
@@ -320,7 +320,7 @@ function ProfileForm() {
       ].map(([name, label, value]) => (
         <label className="block text-sm" key={name}>
           {label}
-          <Input className="mt-2" name={name} defaultValue={value ?? ""} />
+          <Input className="mt-2" name={name ?? ""} defaultValue={value ?? ""} />
         </label>
       ))}
       <Button type="submit" variant="outline">

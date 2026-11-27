@@ -4,8 +4,9 @@ import { useServerFn } from "@tanstack/react-start";
 import { Link } from "@tanstack/react-router";
 import { Trash2, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 import { accountData } from "@/lib/app-data";
-import { sendAgentMessage, clearAgentChat } from "@/lib/agent.functions";
+import { clearAgentChat } from "@/lib/agent.functions";
 import { ngn, usd } from "@/lib/format";
 import { txUrl } from "@/lib/celo";
 import { PageHeader } from "./AppShell";
@@ -36,8 +37,9 @@ import type { ChatPart } from "@/lib/agent.server";
 export function AgentChat() {
   const { data: a } = useSuspenseQuery(accountData);
   const qc = useQueryClient();
-  const call = useServerFn(sendAgentMessage),
-    clear = useServerFn(clearAgentChat);
+  const clear = useServerFn(clearAgentChat);
+  const [liveText, setLiveText] = useState("");
+  const [liveParts, setLiveParts] = useState<ChatPart[]>([]);
   const [text, setText] = useState(""),
     [pending, setPending] = useState<string | null>(null);
   const input = useRef<HTMLTextAreaElement>(null);
@@ -48,8 +50,44 @@ export function AgentChat() {
     if (pending || !value.trim()) return;
     setPending(value);
     setText("");
+    setLiveText("");
+    setLiveParts([]);
     try {
-      await call({ data: { text: value } });
+      const { data: session } = await supabase.auth.getSession();
+      if (!session.session) throw new Error("Please sign in");
+      const res = await fetch("/api/public/chat", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          Authorization: `Bearer ${session.session.access_token}`,
+        },
+        body: JSON.stringify({ text: value }),
+      });
+      if (!res.ok || !res.body) throw new Error("Request failed");
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+      while (true) {
+        const { value: chunk, done } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(chunk, { stream: true });
+        const lines = buffer.split("\n");
+        buffer = lines.pop() ?? "";
+        for (const line of lines) {
+          if (!line) continue;
+          const event = JSON.parse(line) as {
+            text?: string;
+            parts?: ChatPart[];
+            reset?: boolean;
+            error?: string;
+            done?: boolean;
+          };
+          if (event.error) throw new Error(event.error);
+          if (event.reset) setLiveText("");
+          if (event.text) setLiveText((t) => (event.done ? (event.text ?? t) : t + event.text));
+          if (event.parts) setLiveParts(event.parts);
+        }
+      }
       await qc.invalidateQueries({ queryKey: ["account"] });
     } catch {
       toast.error("The agent could not complete your request. Your message is preserved.");
@@ -80,7 +118,7 @@ export function AgentChat() {
           </Button>
         }
       />
-      <div className="mx-auto flex h-[calc(100dvh-230px)] min-h-96 max-w-4xl flex-col px-4 lg:h-[calc(100dvh-145px)] lg:px-8">
+      <div className="chat-workspace mx-auto flex max-w-4xl flex-col px-4 lg:px-8">
         <Conversation>
           <ConversationContent>
             {!a.messages.length && !pending ? (
@@ -133,7 +171,14 @@ export function AgentChat() {
                 </Message>
                 <Message from="assistant">
                   <MessageContent>
-                    <Shimmer>Checking suppliers and your spending permissions…</Shimmer>
+                    {liveParts.map((part, i) => (
+                      <Part key={i} part={part} />
+                    ))}
+                    {liveText ? (
+                      <MessageResponse>{liveText}</MessageResponse>
+                    ) : (
+                      <Shimmer>Checking suppliers and your spending permissions…</Shimmer>
+                    )}
                   </MessageContent>
                 </Message>
               </>
@@ -174,7 +219,7 @@ function Part({ part: p }: { part: ChatPart }) {
         />
         <ToolContent>
           <ToolInput input={p.input} />
-          <ToolOutput output={p.summary} {...(!p.ok ? { errorText: p.summary } : {})} />
+          <ToolOutput output={p.summary} errorText={p.ok ? undefined : p.summary} />
         </ToolContent>
       </Tool>
     );

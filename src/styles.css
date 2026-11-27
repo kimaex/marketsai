@@ -136,7 +136,7 @@
   }
   h1, h2, h3, h4 {
     font-family: var(--font-display);
-    letter-spacing: -0.02em;
+    letter-spacing: 0;
   }
 }
 
@@ -174,3 +174,7 @@
 @utility animate-pulse-dot {
   animation: pulse-dot 1.2s ease-in-out infinite;
 }
+
+.chat-workspace { height: calc(100dvh - 300px); min-height: 280px; }
+@media (min-width: 1024px) { .chat-workspace { height: calc(100dvh - 150px); } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; } }

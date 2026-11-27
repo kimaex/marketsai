@@ -1,5 +1,5 @@
 // MarketMate procurement agent: a tool-using loop on the Lovable AI Gateway (Responses surface).
-import { generateResponse, GatewayError, type ResponsesInputItem } from "@lovable.dev/ai-gateway";
+import { streamResponse, GatewayError, type ResponsesResponse, type ResponsesInputItem } from "@lovable.dev/ai-gateway";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { searchAndRank, priceStats, fxSnapshot } from "./market.server";
 import { createProposal, executePayment, loadPolicy, spentLast24h, isWalletOwner } from "./orders.server";
@@ -133,7 +133,7 @@ type OutputItem =
   | { type: "function_call"; call_id: string; name: string; arguments: string }
   | { type: string };
 
-export async function runAgentTurn(userId: string, text: string, origin: string) {
+export async function runAgentTurn(userId: string, text: string, origin: string, onEvent?: (event: { text?: string; parts?: ChatPart[]; reset?: boolean }) => void, signal?: AbortSignal) {
   const { data: profile } = await supabaseAdmin.from("profiles").select("business_name,city,state").eq("id", userId).maybeSingle();
   const { data: history } = await supabaseAdmin
     .from("chat_messages")
@@ -163,9 +163,15 @@ export async function runAgentTurn(userId: string, text: string, origin: string)
   });
 
   for (let step = 0; step < 7; step++) {
-    let response;
+    let response: ResponsesResponse<typeof MODEL> | undefined;
     try {
-      response = await generateResponse({ model: MODEL, instructions, input, tools });
+      onEvent?.({ reset: true });
+      const stream = await streamResponse({ model: MODEL, instructions, input, tools }, signal ? { signal } : {});
+      for await (const event of stream) {
+        if (event.type === "response.output_text.delta") onEvent?.({ text: event.delta });
+        if (event.type === "response.completed") response = event.response;
+      }
+      if (!response) throw new Error("Incomplete model response");
     } catch (e) {
       if (e instanceof GatewayError) {
         console.error("gateway error", e.code, e.httpStatus, e.ids);
@@ -194,13 +200,14 @@ export async function runAgentTurn(userId: string, text: string, origin: string)
         /* keep empty */
       }
       const result = await runTool(userId, origin, call.name, args, parts);
+      onEvent?.({ parts: [...parts] });
       input.push({ type: "function_call_output", call_id: call.call_id, output: JSON.stringify(result) } as ResponsesInputItem);
     }
   }
 
   if (!finalText) finalText = "Done. Check the cards above for details.";
   const { error } = await supabaseAdmin.from("chat_messages").insert({ owner_id: userId, role: "assistant", content: finalText, parts: parts as unknown as never });
-  if (error) console.error("assistant save failed", error);
+  if (error) throw new Error("Could not save the assistant response");
   return { text: finalText, parts };
 }
 

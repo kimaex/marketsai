@@ -10,7 +10,7 @@ export function LogoMark({ className }: { className?: string }) {
           <stop offset="1" stopColor="var(--primary-glow)" />
         </linearGradient>
       </defs>
-      <rect width="40" height="40" rx="11" fill="url(#mm-g)" />
+      <rect width="40" height="40" rx="11" fill="var(--primary)" />
       <path
         d="M12 17h16l-1.8 11.2a2 2 0 0 1-2 1.8h-8.4a2 2 0 0 1-2-1.8L12 17Z"
         fill="var(--primary-foreground)"
@@ -25,7 +25,7 @@ export function LogoMark({ className }: { className?: string }) {
       <circle cx="20" cy="10" r="2" fill="var(--onchain)" />
       <path
         d="M17 21.5v4M20 21.5v4M23 21.5v4"
-        stroke="url(#mm-g)"
+        stroke="var(--primary)"
         strokeWidth="1.8"
         strokeLinecap="round"
       />

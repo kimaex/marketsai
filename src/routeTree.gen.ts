@@ -20,6 +20,7 @@ import { Route as AuthenticatedOrdersRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedSupplierRouteImport } from './routes/_authenticated/supplier'
 import { Route as ApiPublicAgentRegistrationRouteImport } from './routes/api/public/agent-registration'
+import { Route as ApiPublicChatRouteImport } from './routes/api/public/chat'
 import { Route as ApiPublicX402MarketReportRouteImport } from './routes/api/public/x402/market-report'
 
 const IndexRoute = IndexRouteImport.update({
@@ -78,6 +79,11 @@ const ApiPublicAgentRegistrationRoute =
     path: '/api/public/agent-registration',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicChatRoute = ApiPublicChatRouteImport.update({
+  id: '/api/public/chat',
+  path: '/api/public/chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicX402MarketReportRoute =
   ApiPublicX402MarketReportRouteImport.update({
     id: '/api/public/x402/market-report',
@@ -96,6 +102,7 @@ export interface FileRoutesByFullPath {
   '/settings': typeof AuthenticatedSettingsRoute
   '/supplier': typeof AuthenticatedSupplierRoute
   '/api/public/agent-registration': typeof ApiPublicAgentRegistrationRoute
+  '/api/public/chat': typeof ApiPublicChatRoute
   '/api/public/x402/market-report': typeof ApiPublicX402MarketReportRoute
 }
 export interface FileRoutesByTo {
@@ -109,6 +116,7 @@ export interface FileRoutesByTo {
   '/settings': typeof AuthenticatedSettingsRoute
   '/supplier': typeof AuthenticatedSupplierRoute
   '/api/public/agent-registration': typeof ApiPublicAgentRegistrationRoute
+  '/api/public/chat': typeof ApiPublicChatRoute
   '/api/public/x402/market-report': typeof ApiPublicX402MarketReportRoute
 }
 export interface FileRoutesById {
@@ -124,6 +132,7 @@ export interface FileRoutesById {
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/supplier': typeof AuthenticatedSupplierRoute
   '/api/public/agent-registration': typeof ApiPublicAgentRegistrationRoute
+  '/api/public/chat': typeof ApiPublicChatRoute
   '/api/public/x402/market-report': typeof ApiPublicX402MarketReportRoute
 }
 export interface FileRouteTypes {
@@ -139,6 +148,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/supplier'
     | '/api/public/agent-registration'
+    | '/api/public/chat'
     | '/api/public/x402/market-report'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -152,6 +162,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/supplier'
     | '/api/public/agent-registration'
+    | '/api/public/chat'
     | '/api/public/x402/market-report'
   id:
     | '__root__'
@@ -166,6 +177,7 @@ export interface FileRouteTypes {
     | '/_authenticated/settings'
     | '/_authenticated/supplier'
     | '/api/public/agent-registration'
+    | '/api/public/chat'
     | '/api/public/x402/market-report'
   fileRoutesById: FileRoutesById
 }
@@ -174,6 +186,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   ApiPublicAgentRegistrationRoute: typeof ApiPublicAgentRegistrationRoute
+  ApiPublicChatRoute: typeof ApiPublicChatRoute
   ApiPublicX402MarketReportRoute: typeof ApiPublicX402MarketReportRoute
 }
 
@@ -256,6 +269,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicAgentRegistrationRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/chat': {
+      id: '/api/public/chat'
+      path: '/api/public/chat'
+      fullPath: '/api/public/chat'
+      preLoaderRoute: typeof ApiPublicChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/x402/market-report': {
       id: '/api/public/x402/market-report'
       path: '/api/public/x402/market-report'
@@ -294,6 +314,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   ApiPublicAgentRegistrationRoute: ApiPublicAgentRegistrationRoute,
+  ApiPublicChatRoute: ApiPublicChatRoute,
   ApiPublicX402MarketReportRoute: ApiPublicX402MarketReportRoute,
 }
 export const routeTree = rootRouteImport

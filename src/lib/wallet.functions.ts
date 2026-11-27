@@ -42,7 +42,7 @@ export const claimAgentWallet = createServerFn({ method: "POST" })
   .handler(async ({ context }) => {
     const { data, error } = await context.supabase.rpc("claim_agent_wallet");
     if (error) return { ok: false, reason: "Could not claim the wallet" };
-    return { ok: !!data, reason: data ? null : "Another account already owns the agent wallet" };
+    return { ok: !!data, reason: data ? null : "Wallet ownership must be assigned by the project owner" };
   });
 
 export const registerAgentOnchain = createServerFn({ method: "POST" })
