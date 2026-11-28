@@ -120,7 +120,7 @@ export type PaymentOutcome =
 
 export async function executePayment(userId: string, orderId: string, mode: "owner" | "autonomous"): Promise<PaymentOutcome> {
   if (!(await isWalletOwner(userId))) {
-    return { ok: false, reason: "Only the agent wallet owner can authorize payments. Claim the wallet in Settings." };
+    return { ok: false, reason: "Only the agent wallet owner can authorize payments. Ownership must be assigned by the project owner." };
   }
   const { data: order } = await supabaseAdmin.from("orders").select("*, suppliers(id,business_name,payout_wallet)").eq("id", orderId).maybeSingle();
   if (!order || order.buyer_id !== userId) return { ok: false, reason: "Order not found" };
@@ -177,6 +177,13 @@ export async function executePayment(userId: string, orderId: string, mode: "own
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
     console.error("payment send failed", msg);
+    const definitelyNotSent = msg.includes("AGENT_WALLET_NOT_CONFIGURED") || msg.includes("INSUFFICIENT_BALANCE");
+    if (!definitelyNotSent) {
+      const reason = "Payment outcome is uncertain. Retry is blocked until the wallet transaction is reconciled.";
+      await supabaseAdmin.from("wallet_transactions").update({ status: "pending", error: reason }).eq("id", reservationId);
+      await supabaseAdmin.from("orders").update({ payment_error: reason }).eq("id", orderId);
+      return { ok: false, reason };
+    }
     const friendly = msg.includes("AGENT_WALLET_NOT_CONFIGURED")
       ? "Agent wallet is not set up yet"
       : msg.includes("INSUFFICIENT_BALANCE")

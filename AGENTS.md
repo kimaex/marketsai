@@ -28,3 +28,10 @@ use the editor.
   own key and store it in Secrets.
 - **Secrets.** Lovable manages them. Do not put secret values in the repo.
 <!-- LOVABLE:END -->
+
+## Application architecture
+- Use authenticated TanStack server functions for business mutations and bearer-verified public streaming routes for chat; this preserves session boundaries in the Worker runtime.
+- Keep supplier search, landed-cost ranking and spending checks in separate domain modules; pure financial rules have targeted tests.
+- Store one ongoing conversation per authenticated account in the database; client streaming is transient and saved responses restore after reload.
+- Restrict the dedicated project agent wallet to a server-provisioned wallet-owner role; never let users self-assign ownership.
+- Reserve spending before signing, and retain uncertain broadcasts as pending with retries blocked; unknown outcomes must never release spending capacity.

@@ -122,7 +122,7 @@ export function AgentChat() {
         <Conversation>
           <ConversationContent>
             {!a.messages.length && !pending ? (
-              <div className="mx-auto max-w-md py-10 text-center">
+              <div className="mx-auto max-w-md py-3 text-center">
                 <LogoMark className="mx-auto size-16" />
                 <h2 className="mt-5 text-2xl font-bold">Let's source your next purchase.</h2>
                 <p className="mt-3 text-sm text-muted-foreground">

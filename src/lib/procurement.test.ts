@@ -12,6 +12,10 @@ const policy: SpendingPolicy = {
 };
 
 describe("spending permissions", () => {
+  it("never authorizes non-finite amounts or limits", () => {
+    expect(checkPayment({ policy, amountUsd: Infinity, supplierId: "sup-a", token: "USDC", spentLast24hUsd: 0, mode: "owner" }).allowed).toBe(false);
+    expect(checkPayment({ policy: { ...policy, daily_limit_usd: NaN }, amountUsd: 5, supplierId: "sup-a", token: "USDC", spentLast24hUsd: 0, mode: "owner" }).allowed).toBe(false);
+  });
   it("blocks a payment above the per-transaction limit", () => {
     const r = checkPayment({ policy, amountUsd: 25.01, supplierId: "sup-a", token: "USDC", spentLast24hUsd: 0, mode: "owner" });
     expect(r.allowed).toBe(false);

@@ -52,13 +52,14 @@ export const Route = createFileRoute("/api/public/x402/market-report")({
         if (!verify.isValid) {
           return Response.json({ error: "Payment invalid", reason: verify.invalidReason ?? null }, { status: 402 });
         }
+        // Generate the report before charging so report-generation failures do not consume payment.
+        const { buildMarketReport } = await import("@/lib/market.server");
+        const report = await buildMarketReport(product);
         const settle = await fac.settle(payload, requirements);
         if (!settle.success) {
           return Response.json({ error: "Settlement failed", reason: settle.errorReason ?? null }, { status: 402 });
         }
 
-        const { buildMarketReport } = await import("@/lib/market.server");
-        const report = await buildMarketReport(product);
         return new Response(JSON.stringify({ ...report, payment: { transaction: settle.transaction, network: settle.network } }), {
           status: 200,
           headers: {

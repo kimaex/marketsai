@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Wallet, Save, Copy, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 import { accountData } from "@/lib/app-data";
-import { getWalletOverview, claimAgentWallet, registerAgentOnchain } from "@/lib/wallet.functions";
+import { getWalletOverview, registerAgentOnchain } from "@/lib/wallet.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { addressUrl, txUrl } from "@/lib/celo";
 import { usd } from "@/lib/format";
@@ -17,7 +17,6 @@ export function Settings() {
   const { data: a } = useSuspenseQuery(accountData);
   const qc = useQueryClient();
   const walletFn = useServerFn(getWalletOverview),
-    claim = useServerFn(claimAgentWallet),
     register = useServerFn(registerAgentOnchain);
   const { data: w } = useQuery({ queryKey: ["wallet"], queryFn: () => walletFn() });
   const [busy, setBusy] = useState(false);
@@ -101,18 +100,7 @@ export function Settings() {
             </p>
           )}
           {w && !w.ownerExists && (
-            <Button
-              className="mt-4"
-              onClick={async () => {
-                const r = await claim();
-                if (r.ok) {
-                  toast.success("Wallet claimed");
-                  qc.invalidateQueries({ queryKey: ["wallet"] });
-                } else toast.error(r.reason);
-              }}
-            >
-              Request wallet ownership
-            </Button>
+            <p className="mt-4 text-sm text-warning">Wallet ownership has not been assigned. Only the project owner can authorize a business account to spend.</p>
           )}
           {w?.ownerExists && (
             <p className="mt-3 text-xs text-muted-foreground">

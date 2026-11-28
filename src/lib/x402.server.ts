@@ -1,7 +1,7 @@
 // x402 on Celo mainnet: both the paid resource (market report) and the agent-side payer.
-import { HTTPFacilitatorClient, decodePaymentRequiredHeader, decodePaymentResponseHeader } from "@x402/core/http";
+import { HTTPFacilitatorClient, decodePaymentRequiredHeader, decodePaymentResponseHeader, encodePaymentSignatureHeader } from "@x402/core/http";
 import type { PaymentRequired, PaymentRequirements } from "@x402/core/types";
-import { wrapFetchWithPaymentFromConfig } from "@x402/fetch";
+import { x402Client } from "@x402/core/client";
 import { ExactEvmScheme } from "@x402/evm/exact/client";
 import { CELO_NETWORK_CAIP, TOKENS, X402_FACILITATOR_URL } from "./celo";
 import { agentAccount } from "./celo.server";
@@ -12,7 +12,7 @@ export const REPORT_PRICE_USD = 0.01;
 export function reportPayTo(): `0x${string}` {
   const configured = process.env["X402_PAY_TO"]?.trim();
   if (configured && /^0x[0-9a-fA-F]{40}$/.test(configured)) return configured as `0x${string}`;
-  return agentAccount().address;
+  throw new Error("Configure an independent report provider's X402_PAY_TO address");
 }
 
 export function reportRequirements(): PaymentRequirements {
@@ -62,12 +62,12 @@ export async function readPaymentRequired(url: string): Promise<{ required: Paym
   return { required, offer };
 }
 
-export async function payAndFetch(url: string) {
+export async function payAndFetch(url: string, required: PaymentRequired, offer: PaymentRequirements) {
   const account = agentAccount();
-  const paidFetch = wrapFetchWithPaymentFromConfig(fetch, {
-    schemes: [{ network: CELO_NETWORK_CAIP, client: new ExactEvmScheme(account) }],
-  });
-  const res = await paidFetch(url, { method: "GET" });
+  // Sign precisely the policy-checked offer, never a fresh offer from a second 402 response.
+  const client = new x402Client().register(CELO_NETWORK_CAIP, new ExactEvmScheme(account));
+  const payload = await client.createPaymentPayload({ ...required, accepts: [offer] });
+  const res = await fetch(url, { method: "GET", redirect: "error", headers: { "PAYMENT-SIGNATURE": encodePaymentSignatureHeader(payload) } });
   const receiptHeader = res.headers.get("PAYMENT-RESPONSE");
   const receipt = receiptHeader ? decodePaymentResponseHeader(receiptHeader) : null;
   return { res, receipt };
@@ -81,6 +81,8 @@ export async function buyReport(userId: string, origin: string, product: string)
   const { data: pol } = await supabaseAdmin.from("spending_policies").select("x402_enabled,x402_max_per_call_usd,x402_daily_limit_usd,approved_tokens").eq("owner_id", userId).maybeSingle();
   await loadPolicy(userId);
   if (!pol?.x402_enabled) throw new Error("Paid data (x402) is turned off in your spending controls");
+  if (!pol.approved_tokens.includes("USDC")) throw new Error("USDC is not an approved payment token");
+  if (!facilitator()) throw new Error("x402 facilitator is not configured");
 
   const url = `${origin}/api/public/x402/market-report?product=${encodeURIComponent(product)}`;
   const pre = await readPaymentRequired(url);
@@ -89,6 +91,8 @@ export async function buyReport(userId: string, origin: string, product: string)
     return { data: await pre.free.json(), txHash: null, amountUsd: 0, payTo: "" };
   }
   const amountUsd = Number(pre.offer.amount) / 10 ** TOKENS.USDC.decimals;
+  if (!Number.isFinite(amountUsd) || amountUsd <= 0 || pre.offer.payTo.toLowerCase() !== reportPayTo().toLowerCase()) throw new Error("Invalid or unexpected paid API offer");
+  if (pre.offer.payTo.toLowerCase() === agentAccount().address.toLowerCase()) throw new Error("Paid reports require an independent provider, not a payment to the agent itself");
   if (amountUsd > Number(pol.x402_max_per_call_usd)) {
     throw new Error(`API asks $${amountUsd}, above your x402 per-call limit of $${pol.x402_max_per_call_usd}`);
   }
@@ -107,18 +111,23 @@ export async function buyReport(userId: string, origin: string, product: string)
     throw new Error(error?.message.includes("DAILY_LIMIT_EXCEEDED") ? "Daily x402 limit reached" : "Could not reserve x402 spend");
   }
   try {
-    const { res, receipt } = await payAndFetch(url);
+    const { res, receipt } = await payAndFetch(url, pre.required, pre.offer);
     if (!res.ok) {
       const body = await res.text();
       throw new Error(`Paid request failed (${res.status}): ${body.slice(0, 200)}`);
     }
     const data = await res.json();
     const txHash = receipt?.transaction ?? (data as { payment?: { transaction?: string } }).payment?.transaction ?? null;
+    if (!receipt?.success || !txHash || receipt.network !== CELO_NETWORK_CAIP) throw new Error("Settlement could not be verified; spend remains reserved");
+    const { waitForTx } = await import("./celo.server");
+    const chainReceipt = await waitForTx(txHash as `0x${string}`);
+    if (chainReceipt.status !== "success") throw new Error("Settlement reverted");
     await supabaseAdmin.from("wallet_transactions").update({ status: "confirmed", tx_hash: txHash }).eq("id", reservationId);
     return { data, txHash, amountUsd, payTo: pre.offer.payTo };
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
-    await supabaseAdmin.from("wallet_transactions").update({ status: "failed", error: msg.slice(0, 300) }).eq("id", reservationId);
+    // A provider can settle and then lose the response. Do not free this allowance or automatically repay.
+    await supabaseAdmin.from("wallet_transactions").update({ status: "pending", error: msg.slice(0, 300) }).eq("id", reservationId);
     throw e;
   }
 }

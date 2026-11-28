@@ -154,7 +154,8 @@ export function checkPayment(i: PaymentCheckInput): PaymentCheck {
   const blocks: string[] = [];
   const approvalReasons: string[] = [];
 
-  if (!(i.amountUsd > 0)) blocks.push("Amount must be greater than zero");
+  if (!Number.isFinite(i.amountUsd) || !(i.amountUsd > 0)) blocks.push("Amount must be finite and greater than zero");
+  if (![p.max_per_tx_usd, p.daily_limit_usd, p.autonomous_max_usd, i.spentLast24hUsd].every(v => Number.isFinite(Number(v)) && Number(v) >= 0)) blocks.push("Invalid spending limits");
   if (i.amountUsd > Number(p.max_per_tx_usd)) {
     blocks.push(`Exceeds the per-transaction limit of $${Number(p.max_per_tx_usd).toFixed(2)}`);
   }

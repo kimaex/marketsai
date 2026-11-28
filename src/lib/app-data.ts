@@ -11,12 +11,12 @@ export const accountData = queryOptions({
         supabase.from("profiles").select("*").eq("id", auth.user.id).maybeSingle(),
         supabase.from("spending_policies").select("*").eq("owner_id", auth.user.id).maybeSingle(),
         supabase.from("orders").select("*").order("created_at", { ascending: false }).limit(100),
-        supabase.from("suppliers").select("*").order("created_at", { ascending: false }),
-        supabase.from("products").select("*").eq("active", true),
+        supabase.from("suppliers").select("*").order("created_at", { ascending: false }).limit(500),
+        supabase.from("products").select("*").eq("active", true).order("created_at", { ascending: false }).limit(500),
         supabase
           .from("chat_messages")
           .select("*")
-          .order("created_at", { ascending: true })
+          .order("created_at", { ascending: false })
           .limit(300),
         supabase
           .from("wallet_transactions")
@@ -33,7 +33,7 @@ export const accountData = queryOptions({
       orders: orders.data ?? [],
       suppliers: suppliers.data ?? [],
       products: products.data ?? [],
-      messages: messages.data ?? [],
+      messages: (messages.data ?? []).reverse(),
       transactions: transactions.data ?? [],
     };
   },
